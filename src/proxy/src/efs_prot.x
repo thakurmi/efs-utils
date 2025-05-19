@@ -17,6 +17,10 @@ struct ProxyIdentifier {
     opaque incarnation<PROXY_INCARNATION_LENGTH>;
 };
 
+struct ConnectionMetrics {
+    string csiDriverVersion<>;
+};
+
 struct ScaleUpConfig {
     int max_multiplexed_connections;
     int scale_up_bytes_per_sec_threshold;

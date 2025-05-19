@@ -37,8 +37,21 @@ pub fn create_bind_client_to_partition_request(
         identifier: proxy_id.uuid.as_bytes().to_vec(),
         incarnation: proxy_id.incarnation.to_be_bytes().to_vec(),
     };
+    let connection_metrics: Option<efs_prot::ConnectionMetrics> = Some(efs_prot::ConnectionMetrics {
+        csiDriverVersion: "vTEST".to_string(),
+    });
     let mut payload_buf = Vec::new();
     xdr_codec::pack(&payload, &mut payload_buf)?;
+
+    match connection_metrics {
+        Some(metrics    ) => {
+            xdr_codec::pack(&true, &mut payload_buf)?; // Boolean flag indicating presence
+            xdr_codec::pack(&metrics, &mut payload_buf)?;
+        },
+        None => {
+            xdr_codec::pack(&false, &mut payload_buf)?; // Boolean flag indicating absence
+        }
+    }
 
     let call_body = onc_rpc::CallBody::new(
         EFS_PROGRAM_NUMBER,
