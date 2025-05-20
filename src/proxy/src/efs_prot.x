@@ -18,7 +18,7 @@ struct ProxyIdentifier {
 };
 
 struct ConnectionMetrics {
-    string csiDriverVersion<>;
+    string csi_driver_version<>;
 };
 
 struct ScaleUpConfig {

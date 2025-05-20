@@ -37,12 +37,12 @@ pub fn create_bind_client_to_partition_request(
         identifier: proxy_id.uuid.as_bytes().to_vec(),
         incarnation: proxy_id.incarnation.to_be_bytes().to_vec(),
     };
-    let connection_metrics: Option<efs_prot::ConnectionMetrics> = Some(efs_prot::ConnectionMetrics {
-        csiDriverVersion: "vTEST".to_string(),
-    });
+    let connection_metrics = efs_prot::ConnectionMetrics {
+        csi_driver_version: "vTEST".to_string(),
+    };
     let mut payload_buf = Vec::new();
     xdr_codec::pack(&payload, &mut payload_buf)?;
-    xdr_codec::pack(&metrics, &mut payload_buf)?;
+    xdr_codec::pack(&connection_metrics, &mut payload_buf)?;
 
     let call_body = onc_rpc::CallBody::new(
         EFS_PROGRAM_NUMBER,
