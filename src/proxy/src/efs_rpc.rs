@@ -42,16 +42,7 @@ pub fn create_bind_client_to_partition_request(
     });
     let mut payload_buf = Vec::new();
     xdr_codec::pack(&payload, &mut payload_buf)?;
-
-    match connection_metrics {
-        Some(metrics    ) => {
-            xdr_codec::pack(&true, &mut payload_buf)?; // Boolean flag indicating presence
-            xdr_codec::pack(&metrics, &mut payload_buf)?;
-        },
-        None => {
-            xdr_codec::pack(&false, &mut payload_buf)?; // Boolean flag indicating absence
-        }
-    }
+    xdr_codec::pack(&metrics, &mut payload_buf)?;
 
     let call_body = onc_rpc::CallBody::new(
         EFS_PROGRAM_NUMBER,
