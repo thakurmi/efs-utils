@@ -38,11 +38,13 @@ pub fn create_bind_client_to_partition_request(
         incarnation: proxy_id.incarnation.to_be_bytes().to_vec(),
     };
     let connection_metrics = efs_prot::ConnectionMetrics {
-        csi_driver_version: "vTEST".to_string(),
+        csi_driver_version: "v99.99.99".to_string().as_bytes().to_vec(),
     };
     let mut payload_buf = Vec::new();
     xdr_codec::pack(&payload, &mut payload_buf)?;
+    // println!("After first pack: {}", payload_buf.len());
     xdr_codec::pack(&connection_metrics, &mut payload_buf)?;
+    // println!("After second pack: {}", payload_buf.len());
 
     let call_body = onc_rpc::CallBody::new(
         EFS_PROGRAM_NUMBER,
