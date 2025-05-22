@@ -38,13 +38,13 @@ pub fn create_bind_client_to_partition_request(
         incarnation: proxy_id.incarnation.to_be_bytes().to_vec(),
     };
     let connection_metrics = efs_prot::ConnectionMetrics {
-        csi_driver_version: "v99.99.99".to_string().as_bytes().to_vec(),
+        csi_driver_version: "v999.999.999".to_string().as_bytes().to_vec(),
     };
     let mut payload_buf = Vec::new();
     xdr_codec::pack(&payload, &mut payload_buf)?;
-    // println!("After first pack: {}", payload_buf.len());
+    println!("After first pack: {}", payload_buf.len());
     xdr_codec::pack(&connection_metrics, &mut payload_buf)?;
-    // println!("After second pack: {}", payload_buf.len());
+    println!("After second pack: {}", payload_buf.len());
 
     let call_body = onc_rpc::CallBody::new(
         EFS_PROGRAM_NUMBER,
@@ -105,7 +105,8 @@ pub mod tests {
         let request = create_bind_client_to_partition_request(&proxy_id)?;
 
         let deserialized = onc_rpc::RpcMessage::try_from(request.as_slice())?;
-        let deserialized_proxy_id = parse_bind_client_to_partition_request(&deserialized)?;
+        let (deserialized_proxy_id, deserialized_metrics) = parse_bind_client_to_partition_request(&deserialized)?;
+        
 
         assert_eq!(proxy_id.uuid, deserialized_proxy_id.uuid);
         assert_eq!(proxy_id.incarnation, deserialized_proxy_id.incarnation);
