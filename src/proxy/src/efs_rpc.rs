@@ -19,8 +19,10 @@ pub struct PartitionId {
 pub async fn bind_client_to_partition(
     proxy_id: ProxyIdentifier,
     stream: &mut dyn ProxyStream,
+    csi_driver_version: Option<String>,
 ) -> Result<BindClientResponse, RpcError> {
-    let request = create_bind_client_to_partition_request(&proxy_id)?;
+    info!("CSI Driver Version from bind client to partion: {}", csi_driver_version);
+    let request = create_bind_client_to_partition_request(&proxy_id, csi_driver_version)?;
     stream.write_all(&request).await?;
     stream.flush().await?;
 
@@ -32,19 +34,21 @@ pub async fn bind_client_to_partition(
 
 pub fn create_bind_client_to_partition_request(
     proxy_id: &ProxyIdentifier,
+    csi_driver_version: Option<String>
 ) -> Result<Vec<u8>, RpcError> {
     let payload = efs_prot::ProxyIdentifier {
         identifier: proxy_id.uuid.as_bytes().to_vec(),
         incarnation: proxy_id.incarnation.to_be_bytes().to_vec(),
     };
-    let connection_metrics = efs_prot::ConnectionMetrics {
-        csi_driver_version: "v999.999.999".to_string().as_bytes().to_vec(),
-    };
     let mut payload_buf = Vec::new();
     xdr_codec::pack(&payload, &mut payload_buf)?;
-    println!("After first pack: {}", payload_buf.len());
-    xdr_codec::pack(&connection_metrics, &mut payload_buf)?;
-    println!("After second pack: {}", payload_buf.len());
+    info!("CSI Driver Version from create bind client to partition: {}", csi_driver_version);
+    if csi_driver_version.is_some() {
+        let connection_metrics: Option<efs_prot::ConnectionMetrics> = Some(efs_prot::ConnectionMetrics {
+            csi_driver_version: "vTEST".to_string().as_bytes().to_vec(),
+        });
+        xdr_codec::pack(&connection_metrics, &mut payload_buf)?;
+    }
 
     let call_body = onc_rpc::CallBody::new(
         EFS_PROGRAM_NUMBER,

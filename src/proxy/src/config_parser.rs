@@ -41,6 +41,9 @@ pub struct ProxyConfig {
     /// This nested structure is required for backwards compatibility
     #[serde(alias = "efs")]
     pub nested_config: EfsConfig,
+
+    #[serde(alias = "csi_driver_version")]
+    pub csi_driver_version: Option<String>,
 }
 
 impl FromStr for ProxyConfig {

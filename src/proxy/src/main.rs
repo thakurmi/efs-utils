@@ -72,20 +72,24 @@ async fn main() {
 
         run_sighup_handler(proxy_config.clone(), tls_config.clone());
 
+        info!("CSI Driver Version from main: {}", csi_driver_version);
         let controller = Controller::new(
             &proxy_config.nested_config.listen_addr,
             Arc::new(TlsPartitionFinder::new(tls_config)),
             status_reporter,
+            proxy_config.csi_driver_version,
         )
         .await;
         tokio::spawn(controller.run(sigterm_cancellation_token.clone()))
     } else {
+        info!("CSI Driver Version from main: {}", csi_driver_version);
         let controller = Controller::new(
             &proxy_config.nested_config.listen_addr,
             Arc::new(PlainTextPartitionFinder {
                 mount_target_addr: proxy_config.nested_config.mount_target_addr.clone(),
             }),
             status_reporter,
+            proxy_config.csi_driver_version,
         )
         .await;
         tokio::spawn(controller.run(sigterm_cancellation_token.clone()))
